@@ -32,7 +32,7 @@ public class MoviesController : ControllerBase
     public async Task<IActionResult> Get([FromRoute] string idOrSlug, CancellationToken token)
     {
         var userId = HttpContext.GetUserId();
-        
+
         var movie = Guid.TryParse(idOrSlug, out var id)
             ? await _movieService.GetByIdAsync(id, userId, token)
             : await _movieService.GetBySlugAsync(idOrSlug, userId, token);
@@ -46,11 +46,12 @@ public class MoviesController : ControllerBase
     }
 
     [HttpGet(ApiEndpoints.Movies.GetAll)]
-    public async Task<IActionResult> GetAll(CancellationToken token)
+    public async Task<IActionResult> GetAll([FromQuery] GetAllMoviesRequest request, CancellationToken token)
     {
         var userId = HttpContext.GetUserId();
-        
-        var movies = await _movieService.GetAllAsync(userId, token);
+        var options = request.MapToOptions()
+            .WithUserId(userId);
+        var movies = await _movieService.GetAllAsync(options, token);
 
         var response = movies.MapToResponse();
         return Ok(response);
