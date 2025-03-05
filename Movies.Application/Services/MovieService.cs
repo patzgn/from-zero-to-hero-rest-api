@@ -39,7 +39,7 @@ public class MovieService : IMovieService
     public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOptions options, CancellationToken token = default)
     {
         await _optionsValidator.ValidateAndThrowAsync(options, token);
-        
+
         return await _movieRepository.GetAllAsync(options, token);
     }
 
@@ -58,19 +58,24 @@ public class MovieService : IMovieService
         {
             var rating = await _ratingRepository.GetRatingAsync(movie.Id, token);
             movie.Rating = rating;
-            
+
             return movie;
         }
-        
+
         var ratings = await _ratingRepository.GetRatingAsync(movie.Id, userId.Value, token);
         movie.Rating = ratings.Rating;
         movie.UserRating = ratings.UserRating;
-        
+
         return movie;
     }
 
     public Task<bool> DeleteByIdAsync(Guid id, CancellationToken token = default)
     {
         return _movieRepository.DeleteByIdAsync(id, token);
+    }
+
+    public Task<int> GetCountAsync(string? title, int? yearOfRelease, CancellationToken token = default)
+    {
+        return _movieRepository.GetCountAsync(title, yearOfRelease, token);
     }
 }

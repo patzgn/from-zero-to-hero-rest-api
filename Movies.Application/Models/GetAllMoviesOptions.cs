@@ -11,6 +11,10 @@ public class GetAllMoviesOptions
     public string? SortField { get; set; }
 
     public SortOrder? SortOrder { get; set; }
+
+    public int Page { get; init; }
+
+    public int PageSize { get; init; }
 }
 
 public enum SortOrder
