@@ -3,6 +3,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Api.Auth;
+using Movies.Api.Health;
 using Movies.Api.Mapping;
 using Movies.Application;
 using Movies.Application.Database;
@@ -10,7 +11,6 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
-
 
 builder.Services.AddAuthentication(x =>
 {
@@ -53,8 +53,9 @@ builder.Services.AddApiVersioning(x =>
 
 builder.Services.AddControllers();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.Name);
+
 builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
@@ -62,12 +63,13 @@ builder.Services.AddDatabase(config["Database:ConnectionString"]!);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.MapHealthChecks("_health");
 
 app.UseHttpsRedirection();
 
